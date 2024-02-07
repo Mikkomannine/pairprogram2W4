@@ -1,79 +1,87 @@
 const uuid = require("uuid");
 const services = require("../models/services");
+const express = require('express');
 
-// Get All services
-const getAllservices = (req, res) => {
-  res.json(services);
+// Create a new Service
+const createService = async (req, res) => {
+  try {
+    const { title, snippet, body } = req.body;
+    if (!title || !snippet || !body) {
+      return res
+        .status(400)
+        .json({ error: "All fields (title, snippet, body) are required" });
+    }
+
+    const newService = new Service({ title, snippet, body });
+    const savedService = await newService.save();
+
+    res.status(201).json(savedService);
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
 
-// Get Single service by ID
-const getserviceById = (req, res) => {
-  const found = services.some(
-    (service) => service.id === parseInt(req.params.id)
-  );
+// GET all Services
+const getAllServices = async (req, res) => {
+  try {
+    const Services = await Service.find();
+    res.json(Services);
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 
-  if (found) {
-    res.json(
-      services.filter((service) => service.id === parseInt(req.params.id))
+// GET a single Service by ID
+const getServiceById = async (req, res) => {
+  try {
+    const Service = await Service.findById(req.params.id);
+    if (!Service) {
+      return res.status(404).json({ error: "Service not found" });
+    }
+    res.json(Service);
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+// DELETE a Service by ID
+const deleteService = async (req, res) => {
+  try {
+    const Service = await Service.findByIdAndDelete(req.params.id);
+    if (!Service) {
+      return res.status(404).json({ error: "Service not found" });
+    }
+    res.json({ message: "Service deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+// Replace (Put) a single Service by ID
+const updateService = async (req, res) => {
+  try {
+    const updatedService = await Service.findOneAndUpdate(
+      { _id: req.params.id },
+      req.body,
+      { new: true }// To return the updated document
     );
-  } else {
-    res.status(400).json({ msg: `No service with the id of ${req.params.id}` });
+
+    if (!updatedService) {
+      return res.status(404).json({ error: "Service not found" });
+    }
+
+    res.json(updatedService);
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-// Create a New service
-const createservice = (req, res) => {
-  const newservice = {
-    id: uuid.v4(),
-    ...req.body,
-  };
-
-  if (!newservice.title || !newservice.text) {
-    return res.status(400).json({ msg: "Please include a title and text" });
-  }
-
-  services.push(newservice);
-  res.json(services);
-};
-
-// Update service by ID
-const updateservice = (req, res) => {
-  const found = services.some(
-    (service) => service.id === parseInt(req.params.id)
-  );
-
-  if (found) {
-    services.forEach((service, i) => {
-      if (service.id === parseInt(req.params.id)) {
-        services[i] = { ...service, ...req.body };
-        res.json({ msg: "service updated", service: services[i] });
-      }
-    });
-  } else {
-    res.status(400).json({ msg: `No service with the id of ${req.params.id}` });
-  }
-};
-
-// Delete service by ID
-const deleteservice = (req, res) => {
-  const found = services.some(
-    (service) => service.id === parseInt(req.params.id)
-  );
-
-  if (found) {
-    const updatedservices = services.filter(
-      (service) => service.id !== parseInt(req.params.id)
-    );
-    res.json({ msg: "service deleted", services: updatedservices });
-  } else {
-    res.status(400).json({ msg: `No service with the id of ${req.params.id}` });
-  }
-};
 
 module.exports = {
-  getAllservices,
-  getserviceById,
-  createservice,
-  updateservice,
-  deleteservice,
+  createService,
+  getAllServices,
+  getServiceById,
+  deleteService,
+  updateService,
 };
+

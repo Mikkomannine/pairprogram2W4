@@ -1,71 +1,85 @@
 const uuid = require("uuid");
 const tours = require("../models/tours");
 
-// Get All tours
-const getAlltours = (req, res) => {
-  res.json(tours);
-};
+// Create a new Tour
+const createTour = async (req, res) => {
+  try {
+    const { title, snippet, body } = req.body;
+    if (!title || !snippet || !body) {
+      return res
+        .status(400)
+        .json({ error: "All fields (title, snippet, body) are required" });
+    }
 
-// Get Single tour by ID
-const gettourById = (req, res) => {
-  const found = tours.some((tour) => tour.id === parseInt(req.params.id));
+    const newTour = new Tour({ title, snippet, body });
+    const savedTour = await newTour.save();
 
-  if (found) {
-    res.json(tours.filter((tour) => tour.id === parseInt(req.params.id)));
-  } else {
-    res.status(400).json({ msg: `No tour with the id of ${req.params.id}` });
+    res.status(201).json(savedTour);
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-// Create a New tour
-const createtour = (req, res) => {
-  const newtour = {
-    id: uuid.v4(),
-    ...req.body,
-  };
-
-  if (!newtour.title || !newtour.location) {
-    return res.status(400).json({ msg: "Please include a title and location" });
-  }
-
-  tours.push(newtour);
-  res.json(tours);
-};
-
-// Update tour by ID
-const updatetour = (req, res) => {
-  const found = tours.some((tour) => tour.id === parseInt(req.params.id));
-
-  if (found) {
-    tours.forEach((tour, i) => {
-      if (tour.id === parseInt(req.params.id)) {
-        tours[i] = { ...tour, ...req.body };
-        res.json({ msg: "tour updated", tour: tours[i] });
-      }
-    });
-  } else {
-    res.status(400).json({ msg: `No tour with the id of ${req.params.id}` });
+// GET all Tours
+const getAllTours = async (req, res) => {
+  try {
+    const Tours = await Tour.find();
+    res.json(Tours);
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-// Delete tour by ID
-const deletetour = (req, res) => {
-  const found = tours.some((tour) => tour.id === parseInt(req.params.id));
+// GET a single Tour by ID
+const getTourById = async (req, res) => {
+  try {
+    const Tour = await Tour.findById(req.params.id);
+    if (!Tour) {
+      return res.status(404).json({ error: "Tour not found" });
+    }
+    res.json(Tour);
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 
-  if (found) {
-    const updatedtours = tours.filter(
-      (tour) => tour.id !== parseInt(req.params.id)
+// DELETE a Tour by ID
+const deleteTour = async (req, res) => {
+  try {
+    const Tour = await Tour.findByIdAndDelete(req.params.id);
+    if (!Tour) {
+      return res.status(404).json({ error: "Tour not found" });
+    }
+    res.json({ message: "Tour deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+// Update (Patch) a single Tour by ID
+const updateTour = async (req, res) => {
+  try {
+    const Tour = await Tour.findOneAndReplace(
+      { _id: req.params.id },
+      req.body,
+      { new: true }
     );
-    res.json({ msg: "tour deleted", tours: updatedtours });
-  } else {
-    res.status(400).json({ msg: `No tour with the id of ${req.params.id}` });
+
+    if (!Tour) {
+      return res.status(404).json({ error: "Tour not found" });
+    }
+
+    res.json(Tour);
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 module.exports = {
-  getAlltours,
-  gettourById,
-  createtour,
-  updatetour,
-  deletetour,
+  createTour,
+  getAllTours,
+  getTourById,
+  deleteTour,
+  updateTour,
 };
