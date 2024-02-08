@@ -1,10 +1,10 @@
 const express = require("express");
 const error = require("./middleware/errorMiddleware");
 const found = require("./middleware/notFoundMiddleware");
-const MONGO_URI = "mongodb+srv://user:pass@cluster0.1x4ks.mongodb.net/labs";
 const mongoose = require('mongoose');
 
 require('dotenv').config();
+
 
 const app = express();
 

@@ -1,5 +1,4 @@
 // controllers/usersController.js
-const uuid = require("uuid");
 const users = require("../models/users");
 
 // Create a new User

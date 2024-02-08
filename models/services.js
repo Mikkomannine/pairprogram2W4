@@ -5,7 +5,7 @@ const serviceSchema = new mongoose.Schema({
     id: {
         type: Number,
         required: true,
- 
+        unique: true,
     },
     icon: {
         type: String,
