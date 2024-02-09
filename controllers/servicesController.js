@@ -1,18 +1,18 @@
 
-const services = require("../models/services");
-const express = require('express');
+const Service = require("../models/services");
+
 
 // Create a new Service
 const createService = async (req, res) => {
   try {
-    const { title, snippet, body } = req.body;
-    if (!title || !snippet || !body) {
+    const { icon, title, text } = req.body;
+    if (!icon|| !title || !text) {
       return res
         .status(400)
         .json({ error: "All fields (title, snippet, body) are required" });
     }
 
-    const newService = new Service({ title, snippet, body });
+    const newService = new Service({ icon, title, text });
     const savedService = await newService.save();
 
     res.status(201).json(savedService);
@@ -34,12 +34,12 @@ const getAllServices = async (req, res) => {
 // GET a single Service by ID
 const getServiceById = async (req, res) => {
   try {
-    const Service = await Service.findById(req.params.id);
-    if (!Service) {
+    const services = await Service.findById(req.params.id);
+    if (!services) {
       return res.status(404).json({ error: "Service not found" });
     }
-    res.json(Service);
-  } catch (err) {
+    res.json(services);
+  } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -47,30 +47,28 @@ const getServiceById = async (req, res) => {
 // DELETE a Service by ID
 const deleteService = async (req, res) => {
   try {
-    const Service = await Service.findByIdAndDelete(req.params.id);
-    if (!Service) {
-      return res.status(404).json({ error: "Service not found" });
+    const services = await Service.findOneAndDelete({ _id: req.params.id});
+    if (!services) {
+      return res.status(404).json({ msg: "Service not found" });
     }
-    res.json({ message: "Service deleted successfully" });
+    res.json({ msg: "Service deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-// Replace (Put) a single Service by ID
+// PATCH
 const updateService = async (req, res) => {
   try {
-    const updatedService = await Service.findOneAndUpdate(
+    const services = await Service.findOneAndUpdate(
       { _id: req.params.id },
       req.body,
-      { new: true }// To return the updated document
+      { new: true }
     );
-
-    if (!updatedService) {
-      return res.status(404).json({ error: "Service not found" });
+    if (!services) {
+      return res.status(404).json({ msg: "Service not found" });
     }
-
-    res.json(updatedService);
+    res.json(services);
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error" });
   }

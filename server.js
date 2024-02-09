@@ -1,10 +1,10 @@
 const express = require("express");
 const error = require("./middleware/errorMiddleware");
 const found = require("./middleware/notFoundMiddleware");
-const mongoose = require('mongoose');
-
+const connectDB = require("./db");
 require('dotenv').config();
 
+connectDB();
 
 const app = express();
 

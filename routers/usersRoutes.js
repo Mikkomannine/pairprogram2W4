@@ -10,12 +10,13 @@ router.get("/", usersController.getAllUsers);
 router.get("/:id", usersController.getUserById);
 
 // Create a New user
-router.post("/", checkRole("admin"), usersController.createUser);
+//router.post("/", checkRole("admin"), usersController.createUser);
+router.post("/", usersController.createUser)
 
 // Update user by ID
-router.put("/:id", checkRole("admin"), usersController.updateUser);
+router.patch("/:id", usersController.updateUser);
 
 // Delete user by ID
-router.delete("/:id", checkRole("admin"), usersController.deleteUser);
+router.delete("/:id", usersController.deleteUser);
 
 module.exports = router;

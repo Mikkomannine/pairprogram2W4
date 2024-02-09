@@ -11,8 +11,8 @@ router.get("/", serviceController.getAllServices);
 router.get("/:id", serviceController.getServiceById);
 
 // Accessible only by users with the "admin" role
-router.post("/", checkRole("admin"), serviceController.createService);
-router.put("/:id", checkRole("admin"), serviceController.updateService);
-router.delete("/:id", checkRole("admin"), serviceController.deleteService);
+router.post("/", serviceController.createService);
+router.patch("/:id", serviceController.updateService);
+router.delete("/:id", serviceController.deleteService);
 
 module.exports = router;

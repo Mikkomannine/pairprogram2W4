@@ -1,17 +1,17 @@
 
-const tours = require("../models/tours");
+const Tour = require("../models/tours");
 
 // Create a new Tour
 const createTour = async (req, res) => {
   try {
-    const { title, snippet, body } = req.body;
-    if (!title || !snippet || !body) {
+    const { image, title, price, description, location, duration } = req.body;
+    if (!image || !title || !price || !description || !location || !duration) {
       return res
         .status(400)
         .json({ error: "All fields (title, snippet, body) are required" });
     }
 
-    const newTour = new Tour({ title, snippet, body });
+    const newTour = new Tour({ image, title, price, description, location, duration});
     const savedTour = await newTour.save();
 
     res.status(201).json(savedTour);
@@ -33,11 +33,11 @@ const getAllTours = async (req, res) => {
 // GET a single Tour by ID
 const getTourById = async (req, res) => {
   try {
-    const Tour = await Tour.findById(req.params.id);
-    if (!Tour) {
+    const tours = await Tour.findById(req.params.id);
+    if (!tours) {
       return res.status(404).json({ error: "Tour not found" });
     }
-    res.json(Tour);
+    res.json(tours);
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error" });
   }
@@ -46,8 +46,8 @@ const getTourById = async (req, res) => {
 // DELETE a Tour by ID
 const deleteTour = async (req, res) => {
   try {
-    const Tour = await Tour.findByIdAndDelete(req.params.id);
-    if (!Tour) {
+    const tours = await Tour.findByIdAndDelete(req.params.id);
+    if (!tours) {
       return res.status(404).json({ error: "Tour not found" });
     }
     res.json({ message: "Tour deleted successfully" });
@@ -59,17 +59,17 @@ const deleteTour = async (req, res) => {
 // Update (Patch) a single Tour by ID
 const updateTour = async (req, res) => {
   try {
-    const Tour = await Tour.findOneAndReplace(
+    const tours = await Tour.findOneAndReplace(
       { _id: req.params.id },
       req.body,
       { new: true }
     );
 
-    if (!Tour) {
+    if (!tours) {
       return res.status(404).json({ error: "Tour not found" });
     }
 
-    res.json(Tour);
+    res.json(tours);
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error" });
   }

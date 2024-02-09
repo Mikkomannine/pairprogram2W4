@@ -11,12 +11,12 @@ router.get("/", tourController.getAllTours);
 router.get("/:id", tourController.getTourById);
 
 // Create a new tour
-router.post("/", checkRole("admin"), tourController.createTour);
+router.post("/", tourController.createTour);
 
 // Update a tour by ID
-router.put("/:id", checkRole("admin"), tourController.updateTour);
+router.patch("/:id", tourController.updateTour);
 
 // Delete a tour by ID
-router.delete("/:id", checkRole("admin"), tourController.deleteTour);
+router.delete("/:id", tourController.deleteTour);
 
 module.exports = router;
